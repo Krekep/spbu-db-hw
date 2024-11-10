@@ -45,11 +45,12 @@ INSERT INTO groups (full_name, short_name, students_ids) VALUES
 INSERT INTO students (first_name, last_name, group_id, courses_ids) VALUES 
 ('Иван', 'Иванов', 1, '{1, 2}'),
 ('Петр', 'Петров', 1, '{1}'),
-('Сидор', 'Сидоров', 2, '{}');
+('Сидор', 'Сидоров', 2, '{2}');
 
 INSERT INTO grades (course_id, student_id, grade, grade_str) VALUES 
 (1, 1, 85.00, 'Отлично'),
 (2, 1, 70.00, 'Удовлетворительно'),
+(2, 3, 80.00, 'Хорошо'),
 (1, 2, 92.00, 'Отлично');
 
 ----------------------------------------------------------------------
