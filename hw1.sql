@@ -10,7 +10,7 @@ CREATE TABLE groups (
   id SERIAL PRIMARY KEY,
   full_name VARCHAR(255) NOT NULL,
   short_name VARCHAR(50) NOT NULL,
-  students_ids JSON
+  students_ids INTEGER[]
 );
 
 CREATE TABLE students (
@@ -19,7 +19,7 @@ CREATE TABLE students (
   last_name VARCHAR(100) NOT NULL,
   group_id INT,
   FOREIGN KEY (group_id) REFERENCES groups(id),
-  courses_ids JSON
+  courses_ids INTEGER[]
 );
 
 CREATE TABLE grades (
@@ -38,14 +38,14 @@ INSERT INTO courses (course_name, is_exam, min_grade, max_grade) VALUES
 ('Математика', TRUE, 60.00, 100.00),
 ('Информатика', FALSE, 40.00, 90.00);
 
-INSERT INTO groups (full_name, short_name) VALUES 
-('Группа А', 'A'),
-('Группа Б', 'B');
+INSERT INTO groups (full_name, short_name, students_ids) VALUES 
+('Группа А', 'A', '{1, 2}'),
+('Группа Б', 'B', '{3}');
 
-INSERT INTO students (first_name, last_name, group_id) VALUES 
-('Иван', 'Иванов', 1),
-('Петр', 'Петров', 1),
-('Сидор', 'Сидоров', 2);
+INSERT INTO students (first_name, last_name, group_id, courses_ids) VALUES 
+('Иван', 'Иванов', 1, '{1, 2}'),
+('Петр', 'Петров', 1, '{1}'),
+('Сидор', 'Сидоров', 2, '{}');
 
 INSERT INTO grades (course_id, student_id, grade, grade_str) VALUES 
 (1, 1, 85.00, 'Отлично'),
@@ -55,11 +55,12 @@ INSERT INTO grades (course_id, student_id, grade, grade_str) VALUES
 ----------------------------------------------------------------------
 
 SELECT 
-  groups.full_name AS Группа,
-  AVG(g.grade) AS Средняя оценка,
-  COUNT(DISTINCT g.student_id) AS Количество студентов
+  groups.full_name AS "Группа",
+  AVG(g.grade) AS "Средняя оценка",
+  COUNT(DISTINCT g.student_id) AS "Количество студентов"
 FROM grades g
 JOIN students s ON g.student_id = s.id
 JOIN groups ON s.group_id = groups.id 
 GROUP BY groups.full_name
-HAVING AVG(g.grade) > 70;
+HAVING AVG(g.grade) > 70
+LIMIT 20;
