@@ -1,44 +1,45 @@
-create table student_courses (
-	id serial primary key,
- 	student_id int,
-  	course_id int,
- 	unique (student_id, course_id)
+CREATE TABLE student_courses (
+	id SERIAL PRIMARY KEY, 
+	student_id INT, 
+	course_id INT, 
+	UNIQUE (student_id, course_id)
 );
 
-create table group_courses (
-	id serial primary key,
-	group_id int,
-	course_id int,
-	unique (group_id, course_id)
+CREATE TABLE group_courses (
+	id SERIAL PRIMARY KEY, 
+	group_id INT, 
+	course_id INT, 
+	UNIQUE (group_id, course_id)
 );
-
 
 --------------------------------------------------
 
-insert into student_courses (student_id, course_id) values
-	(1, 1), 
+INSERT INTO
+	student_courses (student_id, course_id)
+VALUES
+	(1, 1),
 	(1, 2),
 	(2, 1),
 	(3, 2);
 
-
 --- по прошлому тз не было связей между группами и курсами
-insert into group_courses (group_id, course_id) values
-	(1, 1), 
-	(1, 2), 
+INSERT INTO
+	group_courses (group_id, course_id)
+VALUES
+	(1, 1),
+	(1, 2),
 	(2, 2);
 
 --------------------------------------------------
 
-alter table students
-drop column if exists courses_ids;
+ALTER TABLE students
+DROP COLUMN IF EXISTS courses_ids;
 
 --- по тз нет таблицы groups_students, поэтому решил оставить массив студентов в группе
 -- alter table groups  
 -- drop column if exists student_ids;
-
 -- добавление уникального ограничения на имя курса
-alter table courses add constraint unique_course_name unique (course_name);
+ALTER TABLE courses ADD CONSTRAINT unique_course_name UNIQUE (course_name);
 
 --------------------------------------------------
 
@@ -49,61 +50,66 @@ alter table courses add constraint unique_course_name unique (course_name);
 -- по умолчанию используется некластерный индекс, он хранится отдельно от таблицы и определяет только логический порядок данных (не влияет на физический порядок размещения)
 -- ускорение достигается поиском ключа в индексе, т.е. в дереве поиска, что работает быстрее, чем линейный проход по всем данным
 -- при использовании unique и primary key создаются неявные индексы
-create index idx_students_group_id on students(group_id);
+CREATE INDEX idx_students_group_id ON
+students(group_id);
 
 --------------------------------------------------------------------
 
 -- запрос показывающий курсы и студентов на них
-select sc.id, c.course_name, s.id, s.first_name, s.last_name, s.group_id from student_courses sc 
-	join courses c on sc.course_id = c.id  -- инф-а о курсах
-	join students s on sc.student_id = s.id  -- инф-а о студентах 
+SELECT sc.id, c.course_name, s.id, s.first_name, s.last_name, s.group_id
+	FROM student_courses sc
+	JOIN courses c ON
+		sc.course_id = c.id -- инф-а о курсах
+	JOIN students s ON
+		sc.student_id = s.id -- инф-а о студентах
+LIMIT 20;
 
 -- запрос возвращающий студентов, у average оценка по курсам выше, чем у остальных в их группе
-with student_courses_avg as (  -- таблица со средней оценкой каждого студента
-  select 
-    sc.student_id as student_id,
-    avg(gc.grade) as avg_grade
-  from student_courses sc
-  join grades gc on sc.course_id = gc.course_id and sc.student_id = gc.student_id 
-  group by sc.student_id
-), student_max_grade as (
-	select 
-		max(sca.avg_grade) as max_group_grade, 
-		g.id as group_id
-	from student_courses_avg sca -- возвращает маскимальную из средних оценок студентов для каждой группы
-		cross join "groups" g
-		join students s on sca.student_id = s.id and s.group_id = g.id 
-	group by g.id
+WITH student_courses_avg AS (  -- таблица со средней оценкой каждого студента
+	SELECT 
+		sc.student_id AS student_id, 
+		AVG(gc.grade) AS avg_grade
+	FROM student_courses sc
+	JOIN grades gc ON sc.course_id = gc.course_id
+	AND sc.student_id = gc.student_id
+	GROUP BY sc.student_id
+), student_max_grade AS ( -- возвращает маскимальную из средних оценок студентов для каждой группы
+	SELECT 
+		MAX(sca.avg_grade) AS max_group_grade, 
+		g.id AS group_id
+	FROM student_courses_avg sca
+	CROSS JOIN "groups" g
+	JOIN students s ON sca.student_id = s.id AND s.group_id = g.id
+	GROUP BY g.id
 )
-select 
-		sc.student_id, 
-		c.course_name, 
-		sca.avg_grade,
-		smg.max_group_grade,
-		s.first_name, 
-		s.last_name, 
-		s.group_id, 
-		g.full_name
-	from student_courses sc 
-	join courses c on sc.course_id = c.id  -- инф-а о курсах
-	join students s on sc.student_id = s.id  -- инф-а о студентах
-	join group_courses gc on gc.course_id = sc.course_id  -- id групп записанных на курс
-	join "groups" g on g.id  = gc.group_id and s.group_id = g.id -- инф-а о группах
-	join student_courses_avg sca on sca.student_id = s.id  -- средняя оценка для каждого студента
-	join student_max_grade smg on smg.group_id = g.id -- максимальная средняя оценка для каждой группы
-where sca.avg_grade >= smg.max_group_grade -- студенты у которых средняя оценка по курсам не ниже максимальной в их группе (т.е. выше чем у других студентов)
-;
-
+SELECT 
+	sc.student_id, 
+	c.course_name, 
+	sca.avg_grade, 
+	smg.max_group_grade, 
+	s.first_name, 
+	s.last_name,
+	s.group_id, 
+	g.full_name
+FROM student_courses sc
+JOIN courses c ON sc.course_id = c.id -- инф-а о курсах
+JOIN students s ON sc.student_id = s.id -- инф-а о студентах
+JOIN group_courses gc ON gc.course_id = sc.course_id -- id групп записанных на курс
+JOIN "groups" g ON g.id = gc.group_id AND s.group_id = g.id	-- инф-а о группах
+JOIN student_courses_avg sca ON sca.student_id = s.id -- средняя оценка для каждого студента
+JOIN student_max_grade smg ON smg.group_id = g.id -- максимальная средняя оценка для каждой группы
+WHERE sca.avg_grade >= smg.max_group_grade -- студенты у которых средняя оценка по курсам не ниже максимальной в их группе (т.е. выше чем у других студентов)
+LIMIT 20;
 
 -------------------------------------------------------------------
 
-
-select 
-    sc.course_id,
-    c.course_name,
-    avg(gc.grade) as avg_grade,
-    count(sc.student_id)
-  from student_courses sc
-  join grades gc on sc.course_id = gc.course_id and sc.student_id = gc.student_id 
-  join courses c on sc.course_id = c.id  -- инф-а о курсах
-  group by sc.course_id, c.course_name 
+SELECT 
+	sc.course_id, 
+	c.course_name, 
+	AVG(gc.grade) AS avg_grade, 
+	COUNT(sc.student_id)
+FROM student_courses sc
+JOIN grades gc ON sc.course_id = gc.course_id AND sc.student_id = gc.student_id
+JOIN courses c ON sc.course_id = c.id -- инф-а о курсах
+GROUP BY sc.course_id, c.course_name
+LIMIT 20;
