@@ -35,3 +35,25 @@ SELECT * FROM Product_Type
 	WHERE Product_Type.Product_type_ID <> ALL(SELECT Product_type_ID FROM Product)
 LIMIT 10
 ;
+
+
+-- Количество сыра, который скоро испортится
+SELECT Volume AS "Cheese count" FROM V_old_Product
+	JOIN Product_Type ON V_old_Product.Product_type_ID = Product_Type.Product_type_ID
+	JOIN Ingredietns ON Product_Type.Ingredient_type_ID = Ingredietns.Ingredient_type_ID
+	WHERE Ingredietns.Ingredient_Name = 'Cheese'
+LIMIT 10
+;
+	
+-- Наш лучший клиент
+SELECT Shop_Name FROM V_orders_per_shop
+	ORDER BY Order_count DESC
+LIMIT 1
+;
+	
+-- Самый быстроприготовляемый сыр
+SELECT Product_Type.Product_Name FROM V_cheese_products AS V
+	JOIN Product_Type ON V.Product_type_ID = Product_Type.Product_type_ID
+	ORDER BY Time_per_volume ASC
+LIMIT 1
+;
