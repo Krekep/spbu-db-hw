@@ -1,11 +1,11 @@
 CREATE PROCEDURE add_new_shop
 (
-	Shop_name	VARCHAR (20)
+	shop_name	VARCHAR (20)
 )
 LANGUAGE SQL
 AS $$
-	INSERT INTO Shop(Shop_ID, Shop_Name)
-		VALUES ((SELECT MAX(Shop_ID) + 1 FROM Shop), Shop_name);
+	INSERT INTO shop(shop_id, shop_name)
+		VALUES ((SELECT MAX(shop_id) + 1 FROM shop), shop_name);
 $$;
 
 -- удаление
@@ -13,37 +13,37 @@ $$;
 
 -- вызов
 /*
-SELECT * FROM Shop;
+SELECT * FROM shop;
 CALL add_new_shop('name');
 
-SELECT * FROM Shop;
+SELECT * FROM shop;
 */
 
 ------------------------------------
 
-CREATE PROCEDURE delete_OOO
+CREATE PROCEDURE delete_ooo
 (
-	input_OOO_name	VARCHAR (20)
+	input_ooo_name	VARCHAR (20)
 )
 LANGUAGE plpgsql 
 AS $$
-	DECLARE temp_OOO_ID INT;
+	DECLARE temp_ooo_id INT;
 BEGIN
-	SELECT OOO.OOO_ID INTO temp_OOO_ID FROM OOO WHERE OOO.OOO_name = input_OOO_name;
+	SELECT ooo.ooo_id INTO temp_ooo_id FROM ooo WHERE ooo.ooo_name = input_ooo_name;
 
-	DELETE FROM OOO WHERE OOO.OOO_ID = temp_OOO_ID;
+	DELETE FROM ooo WHERE ooo.ooo_id = temp_ooo_id;
 END;
 $$;
 
 -- удаление
--- DROP PROCEDURE delete_OOO;
+-- DROP PROCEDURE delete_ooo;
 
 -- вызов
 /*
-SELECT * FROM OOO;
-SELECT * FROM Order_to_factory;
-CALL delete_OOO('MolokoFerma');
+SELECT * FROM ooo;
+SELECT * FROM order_to_factory;
+CALL delete_ooo('MolokoFerma');
 
-SELECT * FROM OOO;
-SELECT * FROM Order_to_factory;
+SELECT * FROM ooo;
+SELECT * FROM order_to_factory;
 */

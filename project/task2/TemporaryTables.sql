@@ -1,7 +1,7 @@
 ---------------------------------------------------------------
 -- Сжатая информация о поставщиках
 ---------------------------------------------------------------
-CREATE TEMP TABLE OOO_cutted AS
-SELECT OOO_ID, Ingredient_type_ID
-FROM OOO
+CREATE TEMP TABLE ooo_cutted AS
+SELECT ooo_id, ingredient_type_id
+FROM ooo
 LIMIT 20;
