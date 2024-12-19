@@ -1,7 +1,7 @@
 ---------------------------------------------------------------
 -- Добавление ограничения на уникальность имени поставщика
 ---------------------------------------------------------------
-ALTER TABLE OOO ADD CONSTRAINT unique_ooo_name UNIQUE (OOO_Name);
+ALTER TABLE ooo ADD CONSTRAINT unique_ooo_name UNIQUE (ooo_name);
 
 
 ---------------------------------------------------------------
@@ -13,8 +13,8 @@ BEGIN
 	p_id := 2;
     IF NOT EXISTS (
         SELECT 1
-        	FROM Product
-        	WHERE Product_ID = p_id AND Product_volume > 0
+        	FROM product
+        	WHERE product_id = p_id AND product_volume > 0
     ) THEN
         RAISE EXCEPTION 'There is no product_id % in stock', p_id;
     END IF;

@@ -1,33 +1,33 @@
 ---------------------------------------------------------------
 -- Количество товаров на складе по типам с истекающим сроком годности
 ---------------------------------------------------------------
-CREATE VIEW V_old_Product(Product_type_ID, Volume)
+CREATE VIEW v_old_product(product_type_id, volume)
 AS
-    SELECT Product.Product_type_ID, SUM(Product_volume)  FROM Product
-		WHERE (DATE_PART('month', CURRENT_DATE) - DATE_PART('month', Product.Best_before_date)) <= 2
-		GROUP BY Product.Product_type_ID
-		HAVING SUM(Product_volume) > 20;
+    SELECT product.product_type_id, SUM(product_volume)  FROM product
+		WHERE (DATE_PART('month', CURRENT_DATE) - DATE_PART('month', product.best_before_date)) <= 2
+		GROUP BY product.product_type_id
+		HAVING SUM(product_volume) > 20;
 
--- DROP VIEW V_old_Product;
+-- DROP VIEW v_old_product;
 
 ---------------------------------------------------------------
 -- Продукты из сыра
 ---------------------------------------------------------------
-CREATE VIEW V_cheese_products(Product_type_ID, Product_name)
+CREATE VIEW v_cheese_products(product_type_id, product_name)
 AS
-    SELECT Product_type_ID, Product_Name  FROM Product_Type, Ingredietns
-		WHERE Product_Type.Ingredient_type_ID = Ingredietns.Ingredient_type_ID
-				AND Ingredient_Name = 'Cheese';
+    SELECT product_type_id, product_name  FROM product_type, ingredietns
+		WHERE product_type.ingredient_type_id = ingredietns.ingredient_type_id
+				AND ingredient_name = 'Cheese';
 	
--- DROP VIEW V_cheese_products;
+-- DROP VIEW v_cheese_products;
 
 ---------------------------------------------------------------
 -- Количество заказов для магазинов
 ---------------------------------------------------------------
-CREATE VIEW V_orders_per_shop(Shop_Name, Order_count)
+CREATE VIEW v_orders_per_shop(shop_name, order_count)
 AS
-    SELECT Shop_name, COUNT(Order_ID) AS "Count" FROM Shop
-		LEFT JOIN Client_Order ON Client_Order.Shop_ID = Shop.Shop_ID
-		GROUP BY Shop_Name;
+    SELECT shop_name, COUNT(order_id) AS "Count" FROM shop
+		LEFT JOIN client_order ON client_order.shop_id = shop.shop_id
+		GROUP BY shop_name;
 
--- DROP VIEW V_orders_per_shop;
+-- DROP VIEW v_orders_per_shop;
