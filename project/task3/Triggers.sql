@@ -23,9 +23,9 @@ EXECUTE FUNCTION del_old_products();
 /*
 INSERT INTO product VALUES (42, 1, CURRENT_DATE + INTERVAL '1 year', 42);
 
-SELECT * FROM product;
+SELECT * FROM product LIMIT 10;
 INSERT INTO client_order VALUES (42, 1, 1, 1500, 42, CURRENT_DATE);
-SELECT * FROM product;
+SELECT * FROM product LIMIT 10;
 */
 ---------------------------------------------------------------
 -- Запрет удаления невыполненных заказов поставщику
@@ -56,13 +56,13 @@ EXECUTE FUNCTION ooo_del_prohib_uncompl();
 
 -- проверка не выполнения транзации
 /*
-SELECT * FROM order_to_factory;
+SELECT * FROM order_to_factory LIMIT 10;
 
 INSERT INTO order_to_factory VALUES (42, 3, 1, CURRENT_DATE + INTERVAL '100 year');
-SELECT * FROM order_to_factory;
+SELECT * FROM order_to_factory LIMIT 10;
 
 DELETE FROM order_to_factory WHERE order_id = 42;
-SELECT * FROM order_to_factory;
+SELECT * FROM order_to_factory LIMIT 10;
 */
 
 
